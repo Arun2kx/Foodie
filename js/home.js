@@ -137,7 +137,7 @@
 
     html += '</div>';
 
-    html += '<div class="hero__image"><img src="https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=500&h=450&fit=crop" alt="Delicious Hyderabadi food"></div>';
+    html += '<div class="hero__image"><img src="https://images.unsplash.com/photo-1526367790999-0150786686a2?w=500&h=450&fit=crop" alt="Food delivery"></div>';
 
     html += '</div></div>';
     el.innerHTML = html;
