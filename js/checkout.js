@@ -64,7 +64,8 @@
       return;
     }
 
-    var html = '<h1 class="checkout-page__title">Checkout</h1>';
+    var html = '<a href="index.html" class="back-btn back-btn--dark"><span class="back-btn__icon">' + Utils.icons.arrowLeft + '</span> Back to Home</a>';
+    html += '<h1 class="checkout-page__title">Checkout</h1>';
     html += '<div class="checkout-layout">';
 
     // Left column

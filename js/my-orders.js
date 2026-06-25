@@ -57,7 +57,8 @@
       return;
     }
 
-    var html = '<h1 class="orders-page__title">My Orders</h1>';
+    var html = '<a href="index.html" class="back-btn back-btn--dark"><span class="back-btn__icon">' + Utils.icons.arrowLeft + '</span> Back to Home</a>';
+    html += '<h1 class="orders-page__title">My Orders</h1>';
 
     for (var i = 0; i < orders.length; i++) {
       html += renderOrderCard(orders[i]);
