@@ -1,0 +1,305 @@
+/* ==========================================================================
+   Responsive Breakpoints — 480px, 768px, 1024px, 1280px
+   ========================================================================== */
+
+/* Large screens */
+@media (max-width: 1280px) {
+  .restaurants-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .hero__image {
+    width: 340px;
+    height: 300px;
+  }
+}
+
+/* Medium screens (tablets) */
+@media (max-width: 1024px) {
+  :root {
+    --header-height: 70px;
+  }
+
+  .header__search {
+    width: 260px;
+  }
+
+  .restaurants-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .checkout-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .bill-summary {
+    position: static;
+  }
+
+  .hero__image {
+    width: 280px;
+    height: 250px;
+  }
+
+  .rest-banner__image {
+    width: 200px;
+    height: 140px;
+  }
+}
+
+/* Small tablets / large phones */
+@media (max-width: 768px) {
+  :root {
+    --header-height: 64px;
+    --grid-gap: 1rem;
+  }
+
+  /* Header */
+  .header__search {
+    display: none;
+  }
+
+  .header__menu-toggle {
+    display: flex;
+  }
+
+  .header__nav {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--color-white);
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-6);
+    gap: var(--space-4);
+    transform: translateX(-100%);
+    transition: transform var(--transition-base);
+    z-index: var(--z-overlay);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .header__nav--open {
+    transform: translateX(0);
+  }
+
+  .header__nav-link {
+    font-size: var(--font-size-lg);
+    padding: var(--space-2) 0;
+    width: 100%;
+  }
+
+  .header__auth {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-gray-100);
+    margin-top: var(--space-2);
+  }
+
+  /* Hero */
+  .hero {
+    padding: var(--space-10) 0;
+    padding-top: calc(var(--header-height) + var(--space-10));
+  }
+
+  .hero__inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero__title {
+    font-size: var(--font-size-4xl);
+  }
+
+  .hero__subtitle {
+    font-size: var(--font-size-lg);
+  }
+
+  .hero__search {
+    max-width: 100%;
+  }
+
+  .hero__stats {
+    justify-content: center;
+  }
+
+  .hero__image {
+    width: 100%;
+    max-width: 360px;
+    height: 220px;
+  }
+
+  /* Restaurant Banner */
+  .rest-banner__inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .rest-banner__name {
+    font-size: var(--font-size-3xl);
+  }
+
+  .rest-banner__meta {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Menu Controls */
+  .menu-controls__inner {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .menu-controls__search {
+    width: 100%;
+  }
+
+  /* Footer */
+  .footer__grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  /* Address Form */
+  .address-form .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Orders */
+  .order-card__header {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  /* Success */
+  .success-card {
+    padding: var(--space-8) var(--space-6);
+  }
+
+  .success-card__actions {
+    flex-direction: column;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  :root {
+    --header-height: 56px;
+  }
+
+  .container {
+    padding: 0 var(--space-3);
+  }
+
+  .header__logo {
+    font-size: var(--font-size-2xl);
+  }
+
+  .hero__title {
+    font-size: var(--font-size-3xl);
+  }
+
+  .hero__stats {
+    gap: var(--space-4);
+  }
+
+  .hero__stat-value {
+    font-size: var(--font-size-2xl);
+  }
+
+  .restaurants-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .restaurant-card__image-wrap {
+    height: 160px;
+  }
+
+  .filters {
+    gap: var(--space-2);
+  }
+
+  .filter-chip {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--font-size-sm);
+  }
+
+  .category-item__icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+
+  /* Menu Items */
+  .menu-item {
+    flex-direction: column-reverse;
+    gap: var(--space-3);
+  }
+
+  .menu-item__image-wrap {
+    align-self: flex-end;
+  }
+
+  .menu-item__image {
+    width: 110px;
+    height: 96px;
+  }
+
+  /* Cart */
+  .cart-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .cart-item__right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .coupon-input-wrap {
+    flex-direction: column;
+  }
+
+  /* Checkout */
+  .checkout-page__title {
+    font-size: var(--font-size-2xl);
+  }
+
+  /* Orders page */
+  .order-card {
+    padding: var(--space-4);
+  }
+
+  .order-card__footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  /* Modal */
+  .modal {
+    margin: var(--space-4);
+    max-height: calc(100vh - var(--space-8));
+  }
+
+  .modal__header {
+    padding: var(--space-4) var(--space-4) var(--space-2);
+  }
+
+  .modal__body {
+    padding: var(--space-3) var(--space-4) var(--space-4);
+  }
+
+  .modal__title {
+    font-size: var(--font-size-2xl);
+  }
+}

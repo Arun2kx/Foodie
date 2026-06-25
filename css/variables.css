@@ -1,0 +1,110 @@
+/* ==========================================================================
+   Design Tokens — Swiggy-inspired palette
+   ========================================================================== */
+
+:root {
+  /* Brand Colors */
+  --color-primary: #FC8019;
+  --color-primary-dark: #E06C00;
+  --color-primary-light: #FFF3E6;
+  --color-primary-rgb: 252, 128, 25;
+
+  /* Neutral Colors */
+  --color-black: #1B1B1B;
+  --color-gray-900: #282C3F;
+  --color-gray-800: #3D4152;
+  --color-gray-700: #535665;
+  --color-gray-600: #686B78;
+  --color-gray-500: #7E808C;
+  --color-gray-400: #93959F;
+  --color-gray-300: #BEBFC5;
+  --color-gray-200: #D4D5D9;
+  --color-gray-100: #E9E9EB;
+  --color-gray-50: #F2F2F3;
+  --color-white: #FFFFFF;
+
+  /* Semantic Colors */
+  --color-success: #48C479;
+  --color-success-dark: #1BA672;
+  --color-error: #E23744;
+  --color-error-dark: #BB2D3B;
+  --color-warning: #DB7C38;
+  --color-info: #5D8ED5;
+  --color-veg: #0F8A65;
+  --color-nonveg: #E23744;
+  --color-star: #FF9F0A;
+
+  /* Background Colors */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8F8F8;
+  --bg-tertiary: #F2F2F3;
+  --bg-overlay: rgba(0, 0, 0, 0.65);
+  --bg-card: #FFFFFF;
+
+  /* Typography */
+  --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+  --font-size-xs: 0.6875rem;   /* 11px */
+  --font-size-sm: 0.75rem;     /* 12px */
+  --font-size-md: 0.8125rem;   /* 13px */
+  --font-size-base: 0.875rem;  /* 14px */
+  --font-size-lg: 1rem;        /* 16px */
+  --font-size-xl: 1.125rem;    /* 18px */
+  --font-size-2xl: 1.25rem;    /* 20px */
+  --font-size-3xl: 1.5rem;     /* 24px */
+  --font-size-4xl: 2rem;       /* 32px */
+  --font-size-5xl: 2.5rem;     /* 40px */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Spacing */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-full: 50%;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 8px 30px rgba(0, 0, 0, 0.15);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --shadow-dropdown: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  /* Z-Index Scale */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* Layout */
+  --container-max: 1200px;
+  --header-height: 80px;
+  --grid-gap: 2rem;
+}

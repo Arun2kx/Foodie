@@ -1,0 +1,95 @@
+/* ==========================================================================
+   Auth Styles — Login, Signup, Forgot Password Modals
+   ========================================================================== */
+
+.auth-modal .modal__subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-gray-500);
+  margin-top: var(--space-1);
+}
+
+.auth-modal .form-group {
+  margin-bottom: var(--space-4);
+}
+
+.auth-modal .form-input {
+  padding: var(--space-3) var(--space-4);
+}
+
+.auth-modal .btn--primary {
+  margin-top: var(--space-2);
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: var(--space-4);
+  font-size: var(--font-size-base);
+  color: var(--color-gray-600);
+}
+
+.auth-switch__link {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.auth-switch__link:hover {
+  text-decoration: underline;
+}
+
+.auth-forgot {
+  text-align: right;
+  margin-top: calc(-1 * var(--space-2));
+  margin-bottom: var(--space-4);
+}
+
+.auth-forgot__link {
+  font-size: var(--font-size-md);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.auth-forgot__link:hover {
+  text-decoration: underline;
+}
+
+.auth-or {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+  color: var(--color-gray-400);
+  font-size: var(--font-size-md);
+}
+
+.auth-or::before,
+.auth-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-gray-200);
+}
+
+/* Password Visibility Toggle */
+.password-wrap {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-gray-400);
+  cursor: pointer;
+  padding: var(--space-1);
+}
+
+.password-toggle:hover {
+  color: var(--color-gray-600);
+}
+
+.password-toggle svg {
+  width: 18px;
+  height: 18px;
+}
