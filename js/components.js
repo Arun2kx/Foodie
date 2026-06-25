@@ -12,13 +12,9 @@
   var Auth = Foodie.Auth;
   var Cart = Foodie.Cart;
 
-  // Store last header options for re-rendering after login
-  Components._lastHeaderOptions = {};
-
   // Render header
   Components.renderHeader = function(options) {
     options = options || {};
-    Components._lastHeaderOptions = options;
     var headerEl = document.getElementById('app-header');
     if (!headerEl) return;
 
