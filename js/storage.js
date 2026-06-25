@@ -1,5 +1,11 @@
 /* ==========================================================================
-   Foodie.Storage — localStorage Abstraction, User-Scoped Keys
+   Foodie.Storage — Persistent Storage with Cookie Session Management
+
+   Architecture:
+   - Session: Stored in cookies (persists across all pages, like Swiggy/Zomato)
+   - User data: localStorage primary, cookie backup for current user
+   - Cart/Orders: localStorage (user-scoped keys)
+   - Memory cache: In-page cache for performance
    ========================================================================== */
 
 (function() {
@@ -9,49 +15,75 @@
 
   var Storage = {};
 
-  // In-memory fallback when localStorage fails
-  var _memoryStore = {};
+  // In-memory cache for current page performance
+  var _memoryCache = {};
 
-  // Basic get/set/remove
-  Storage.get = function(key) {
-    // Check memory first (fastest, always reliable)
-    if (_memoryStore.hasOwnProperty(key)) {
-      return _memoryStore[key];
+  // ---- Cookie Helpers (reliable cross-page persistence) ----
+
+  function _setCookie(name, value, days) {
+    var expires = '';
+    if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = '; expires=' + date.toUTCString();
     }
-    // Then try localStorage
+    document.cookie = name + '=' + encodeURIComponent(value) + expires + '; path=/; SameSite=Lax';
+  }
+
+  function _getCookie(name) {
+    var nameEQ = name + '=';
+    var parts = document.cookie.split(';');
+    for (var i = 0; i < parts.length; i++) {
+      var c = parts[i].trim();
+      if (c.indexOf(nameEQ) === 0) {
+        return decodeURIComponent(c.substring(nameEQ.length));
+      }
+    }
+    return null;
+  }
+
+  function _removeCookie(name) {
+    document.cookie = name + '=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax';
+  }
+
+  // ---- Core Storage (localStorage + memory cache) ----
+
+  Storage.get = function(key) {
+    // Try localStorage first (persists across pages)
     try {
       var data = localStorage.getItem(key);
       if (data) {
         var parsed = JSON.parse(data);
-        _memoryStore[key] = parsed; // Cache in memory for reliability
+        _memoryCache[key] = parsed;
         return parsed;
       }
     } catch (e) {
-      // localStorage failed
+      // localStorage unavailable
     }
-    return null;
+    // Fallback to memory cache (current page only)
+    return _memoryCache.hasOwnProperty(key) ? _memoryCache[key] : null;
   };
 
   Storage.set = function(key, value) {
-    // Always store in memory as fallback
-    _memoryStore[key] = value;
+    _memoryCache[key] = value;
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (e) {
-      console.warn('Storage.set failed for key:', key, '- using memory fallback');
+      // localStorage unavailable — memory cache is the fallback
     }
   };
 
   Storage.remove = function(key) {
-    delete _memoryStore[key];
+    delete _memoryCache[key];
     try {
       localStorage.removeItem(key);
     } catch (e) {
-      console.warn('Storage.remove failed for key:', key);
+      // ignore
     }
   };
 
-  // Users CRUD
+  // ---- Users CRUD ----
+
   Storage.getUsers = function() {
     return Storage.get(Foodie.Config.STORAGE_KEYS.USERS) || [];
   };
@@ -82,6 +114,19 @@
     for (var i = 0; i < users.length; i++) {
       if (users[i].id === id) return users[i];
     }
+    // Fallback: recover current user from cookie if localStorage lost the data
+    var cookieUser = _getCookie('foodie_current_user');
+    if (cookieUser) {
+      try {
+        var user = JSON.parse(cookieUser);
+        if (user && user.id === id) {
+          // Re-sync user back into the users array in localStorage
+          users.push(user);
+          Storage.saveUsers(users);
+          return user;
+        }
+      } catch (e) {}
+    }
     return null;
   };
 
@@ -100,22 +145,50 @@
       }
     }
     Storage.saveUsers(users);
+    // Update cookie if this is the current user
+    var session = Storage.getSession();
+    if (session === updatedUser.id) {
+      _setCookie('foodie_current_user', JSON.stringify(updatedUser), 30);
+    }
   };
 
-  // Session
-  Storage.getSession = function() {
-    return Storage.get(Foodie.Config.STORAGE_KEYS.SESSION);
-  };
+  // ---- Session Management (Cookie-primary for cross-page persistence) ----
 
   Storage.setSession = function(userId) {
+    // Store in localStorage + memory
     Storage.set(Foodie.Config.STORAGE_KEYS.SESSION, userId);
+    // Store in cookie — this is the PRIMARY cross-page session store
+    _setCookie('foodie_session', userId, 30);
+    // Cache the current user object in a cookie so it survives page navigation
+    // even if localStorage is unreliable
+    var user = Storage.findUserById(userId);
+    if (user) {
+      _setCookie('foodie_current_user', JSON.stringify(user), 30);
+    }
+  };
+
+  Storage.getSession = function() {
+    // Try localStorage + memory first
+    var session = Storage.get(Foodie.Config.STORAGE_KEYS.SESSION);
+    if (session) return session;
+    // Cookie fallback — works across all pages
+    var cookieSession = _getCookie('foodie_session');
+    if (cookieSession) {
+      // Re-sync to localStorage + memory for this page
+      Storage.set(Foodie.Config.STORAGE_KEYS.SESSION, cookieSession);
+      return cookieSession;
+    }
+    return null;
   };
 
   Storage.clearSession = function() {
     Storage.remove(Foodie.Config.STORAGE_KEYS.SESSION);
+    _removeCookie('foodie_session');
+    _removeCookie('foodie_current_user');
   };
 
-  // User-scoped cart
+  // ---- User-Scoped Cart ----
+
   Storage.getCart = function(userId) {
     return Storage.get(Foodie.Config.STORAGE_KEYS.CART_PREFIX + userId) || { restaurantId: null, restaurantName: '', items: [] };
   };
@@ -128,7 +201,8 @@
     Storage.remove(Foodie.Config.STORAGE_KEYS.CART_PREFIX + userId);
   };
 
-  // User-scoped orders
+  // ---- User-Scoped Orders ----
+
   Storage.getOrders = function(userId) {
     return Storage.get(Foodie.Config.STORAGE_KEYS.ORDERS_PREFIX + userId) || [];
   };
