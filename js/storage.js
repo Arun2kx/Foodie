@@ -14,14 +14,22 @@
 
   // Basic get/set/remove
   Storage.get = function(key) {
+    // Check memory first (fastest, always reliable)
+    if (_memoryStore.hasOwnProperty(key)) {
+      return _memoryStore[key];
+    }
+    // Then try localStorage
     try {
       var data = localStorage.getItem(key);
-      if (data) return JSON.parse(data);
+      if (data) {
+        var parsed = JSON.parse(data);
+        _memoryStore[key] = parsed; // Cache in memory for reliability
+        return parsed;
+      }
     } catch (e) {
-      // localStorage failed, fall through to memory
+      // localStorage failed
     }
-    // Fallback to memory store
-    return _memoryStore.hasOwnProperty(key) ? _memoryStore[key] : null;
+    return null;
   };
 
   Storage.set = function(key, value) {
