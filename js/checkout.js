@@ -168,11 +168,46 @@
     html += '</div>';
 
     html += '</form></div>';
+
+    // Special Instructions
+    html += '<div class="instructions-section">';
+    html += '<h3 class="instructions-section__title">Special Instructions</h3>';
+    html += '<textarea class="form-input instructions-textarea" id="special-instructions" placeholder="e.g., Extra spicy, no onions, ring the doorbell" maxlength="200" rows="3"></textarea>';
+    html += '</div>';
+
     return html;
+  }
+
+  function getEstimatedDeliveryTime() {
+    var cart = Cart.get();
+    if (!cart.restaurantId) return null;
+
+    var Data = Foodie.Data;
+    var restaurant = null;
+    for (var i = 0; i < Data.restaurants.length; i++) {
+      if (Data.restaurants[i].id === cart.restaurantId) {
+        restaurant = Data.restaurants[i];
+        break;
+      }
+    }
+    if (!restaurant) return null;
+
+    // Parse deliveryTime like "30-35 min" — take the upper bound
+    var match = restaurant.deliveryTime.match(/(\d+)/g);
+    var minutes = match ? parseInt(match[match.length - 1]) : 30;
+
+    var eta = new Date();
+    eta.setMinutes(eta.getMinutes() + minutes);
+    var hours = eta.getHours();
+    var mins = eta.getMinutes();
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    return hours + ':' + (mins < 10 ? '0' : '') + mins + ' ' + ampm;
   }
 
   function renderBillSummary() {
     var bill = Cart.calculateBill(state.couponApplied ? state.couponApplied.code : null);
+    var eta = getEstimatedDeliveryTime();
 
     var html = '<div class="bill-summary">';
     html += '<h3 class="bill-summary__title">Bill Details</h3>';
@@ -192,6 +227,14 @@
     html += '</span></div>';
 
     html += '<div class="bill-row bill-row--total"><span>To Pay</span><span>' + Utils.formatCurrency(bill.total) + '</span></div>';
+
+    // Estimated delivery time
+    if (eta) {
+      html += '<div class="bill-summary__eta">';
+      html += Utils.icons.clock;
+      html += '<span>Estimated delivery by <strong>' + eta + '</strong></span>';
+      html += '</div>';
+    }
 
     html += '<div class="bill-summary__payment">';
     html += '<div class="bill-summary__payment-label">Payment Method</div>';
@@ -308,6 +351,9 @@
 
     var cart = Cart.get();
     var bill = Cart.calculateBill(state.couponApplied ? state.couponApplied.code : null);
+    var eta = getEstimatedDeliveryTime();
+    var instructionsEl = document.getElementById('special-instructions');
+    var specialInstructions = instructionsEl ? instructionsEl.value.trim() : '';
 
     var order = {
       id: 'ORD' + Date.now().toString(36).toUpperCase(),
@@ -327,7 +373,9 @@
       },
       paymentMethod: 'Cash on Delivery',
       status: 'Confirmed',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      estimatedDelivery: eta,
+      specialInstructions: specialInstructions || null
     };
 
     Storage.addOrder(user.id, order);

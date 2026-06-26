@@ -58,6 +58,26 @@
     --grid-gap: 1rem;
   }
 
+  /* Bottom Navigation - show on mobile */
+  .bottom-nav {
+    display: flex;
+  }
+
+  /* Add bottom padding to main content so it's not hidden behind bottom nav */
+  .main {
+    padding-bottom: 70px;
+  }
+
+  /* Add bottom padding to footer so it clears the nav */
+  .footer {
+    margin-bottom: 60px;
+  }
+
+  /* Toast should appear above bottom nav */
+  .toast-container {
+    bottom: 80px;
+  }
+
   /* Header */
   .header__search {
     display: none;

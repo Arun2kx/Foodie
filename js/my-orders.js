@@ -65,6 +65,7 @@
     }
 
     el.innerHTML = html;
+    bindReorderButtons();
   }
 
   function renderOrderCard(order) {
@@ -93,14 +94,91 @@
     }
     html += '</div>';
 
+    // Special instructions (if any)
+    if (order.specialInstructions) {
+      html += '<div class="order-card__instructions">';
+      html += '<span class="order-card__instructions-label">Instructions:</span> ';
+      html += Utils.sanitizeHTML(order.specialInstructions);
+      html += '</div>';
+    }
+
     // Footer
     html += '<div class="order-card__footer">';
     html += '<span class="order-card__date">' + Utils.formatDate(order.createdAt) + '</span>';
     html += '<span class="order-card__total">Total: ' + Utils.formatCurrency(order.total) + '</span>';
     html += '</div>';
 
+    // Reorder button
+    html += '<div class="order-card__reorder">';
+    html += '<button class="btn btn--primary btn--sm reorder-btn" data-order-index="' + order.id + '">Reorder</button>';
+    html += '</div>';
+
     html += '</div>';
     return html;
+  }
+
+  function bindReorderButtons() {
+    var btns = document.querySelectorAll('.reorder-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].addEventListener('click', function() {
+        var orderId = this.getAttribute('data-order-index');
+        handleReorder(orderId);
+      });
+    }
+  }
+
+  function handleReorder(orderId) {
+    var user = Foodie.Auth.getCurrentUser();
+    if (!user) {
+      Foodie.Auth.openLoginModal();
+      return;
+    }
+
+    var orders = Storage.getOrders(user.id);
+    var order = null;
+    for (var i = 0; i < orders.length; i++) {
+      if (orders[i].id === orderId) {
+        order = orders[i];
+        break;
+      }
+    }
+
+    if (!order) return;
+
+    var Cart = Foodie.Cart;
+    var result = Cart.bulkAddItems(order.restaurantId, order.restaurantName, order.items);
+
+    if (result.success) {
+      Utils.showToast('Items added to cart!', 'success');
+      Components.updateCartBadge();
+    } else if (result.reason === 'conflict') {
+      // Show conflict modal for reorder
+      var cart = Cart.get();
+      var overlay = document.getElementById('conflict-modal');
+      if (!overlay) {
+        var div = document.createElement('div');
+        div.innerHTML = '<div class="modal-overlay" id="conflict-modal"><div class="modal"><div class="modal__header"><h2 class="modal__title">Replace cart?</h2><button class="modal__close" onclick="document.getElementById(\'conflict-modal\').classList.remove(\'modal-overlay--active\');document.body.style.overflow=\'\';">' + Utils.icons.close + '</button></div><div class="modal__body conflict-modal"><p class="conflict-modal__text" id="conflict-text"></p><div class="conflict-modal__actions"><button class="btn btn--ghost" id="conflict-no">No</button><button class="btn btn--primary" id="conflict-yes">Yes, start fresh</button></div></div></div></div>';
+        document.body.appendChild(div.firstChild);
+        overlay = document.getElementById('conflict-modal');
+      }
+
+      document.getElementById('conflict-text').textContent = 'Your cart contains items from ' + cart.restaurantName + '. Would you like to clear the cart and add items from ' + order.restaurantName + '?';
+      overlay.classList.add('modal-overlay--active');
+      document.body.style.overflow = 'hidden';
+
+      document.getElementById('conflict-no').onclick = function() {
+        overlay.classList.remove('modal-overlay--active');
+        document.body.style.overflow = '';
+      };
+
+      document.getElementById('conflict-yes').onclick = function() {
+        Cart.replaceWithItems(order.restaurantId, order.restaurantName, order.items);
+        overlay.classList.remove('modal-overlay--active');
+        document.body.style.overflow = '';
+        Utils.showToast('Items added to cart!', 'success');
+        Components.updateCartBadge();
+      };
+    }
   }
 
   document.addEventListener('DOMContentLoaded', init);

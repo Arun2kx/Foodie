@@ -55,20 +55,20 @@
       }
     ],
 
-    // Food categories with emojis
+    // Food categories with real images
     CATEGORIES: [
-      { id: 'biryani', name: 'Biryani', emoji: '\uD83C\uDF5A' },
-      { id: 'haleem', name: 'Haleem', emoji: '\uD83C\uDF72' },
-      { id: 'dosa', name: 'Dosa', emoji: '\uD83E\uDDC7' },
-      { id: 'pizza', name: 'Pizza', emoji: '\uD83C\uDF55' },
-      { id: 'burger', name: 'Burger', emoji: '\uD83C\uDF54' },
-      { id: 'chinese', name: 'Chinese', emoji: '\uD83E\uDD62' },
-      { id: 'kebab', name: 'Kebabs', emoji: '\uD83C\uDF56' },
-      { id: 'dessert', name: 'Desserts', emoji: '\uD83C\uDF70' },
-      { id: 'thali', name: 'Thali', emoji: '\uD83C\uDF5B' },
-      { id: 'rolls', name: 'Rolls', emoji: '\uD83C\uDF2F' },
-      { id: 'icecream', name: 'Ice Cream', emoji: '\uD83C\uDF68' },
-      { id: 'chai', name: 'Chai', emoji: '\u2615' }
+      { id: 'biryani', name: 'Biryani', image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=150&h=150&fit=crop' },
+      { id: 'haleem', name: 'Haleem', image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=150&h=150&fit=crop' },
+      { id: 'dosa', name: 'Dosa', image: 'https://images.unsplash.com/photo-1630383249896-424e482df921?w=150&h=150&fit=crop' },
+      { id: 'pizza', name: 'Pizza', image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=150&h=150&fit=crop' },
+      { id: 'burger', name: 'Burger', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=150&h=150&fit=crop' },
+      { id: 'chinese', name: 'Chinese', image: 'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=150&h=150&fit=crop' },
+      { id: 'kebab', name: 'Kebabs', image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=150&h=150&fit=crop' },
+      { id: 'dessert', name: 'Desserts', image: 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=150&h=150&fit=crop' },
+      { id: 'thali', name: 'Thali', image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=150&h=150&fit=crop' },
+      { id: 'rolls', name: 'Rolls', image: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=150&h=150&fit=crop' },
+      { id: 'icecream', name: 'Ice Cream', image: 'https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=150&h=150&fit=crop' },
+      { id: 'chai', name: 'Chai', image: 'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=150&h=150&fit=crop' }
     ],
 
     // Validation
@@ -92,6 +92,7 @@
 
     // Filter options
     FILTERS: [
+      { id: 'favourites', label: 'Favourites' },
       { id: 'rating4', label: 'Rating 4.0+' },
       { id: 'fast_delivery', label: 'Fast Delivery' },
       { id: 'pure_veg', label: 'Pure Veg' },

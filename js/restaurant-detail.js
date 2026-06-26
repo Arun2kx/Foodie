@@ -47,7 +47,15 @@
     Components.renderFooter();
     renderBanner();
     renderMenuControls();
-    renderMenu();
+
+    // Show skeleton loading first, then render actual menu
+    var menuEl = document.getElementById('menu-items');
+    if (menuEl) {
+      menuEl.innerHTML = Components.renderSkeletonMenuItems(6);
+    }
+    setTimeout(function() {
+      renderMenu();
+    }, 400);
 
     // Insert auth modals
     var modalsContainer = document.getElementById('modals');

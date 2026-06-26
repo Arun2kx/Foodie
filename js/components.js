@@ -22,7 +22,7 @@
 
     // Left: Logo + Search
     html += '<div class="header__left">';
-    html += '<a href="index.html" class="header__logo"><span class="header__logo-icon">\uD83C\uDF5C</span> Foodie</a>';
+    html += '<a href="index.html" class="header__logo"><img class="header__logo-img" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=80&h=80&fit=crop" alt="Foodie"> Foodie</a>';
 
     if (!options.hideSearch) {
       html += '<div class="header__search">';
@@ -60,6 +60,9 @@
     html += '</div>';
 
     headerEl.innerHTML = html;
+
+    // Render bottom navigation for mobile
+    Components.renderBottomNav();
 
     // Bind header search
     var headerSearch = document.getElementById('header-search');
@@ -250,7 +253,11 @@
 
   // Render restaurant card
   Components.renderRestaurantCard = function(restaurant, searchQuery) {
-    var html = '<a href="restaurant.html?id=' + restaurant.id + '" class="restaurant-card">';
+    var user = Auth.getCurrentUser();
+    var isFav = user ? Foodie.Storage.isFavourite(user.id, restaurant.id) : false;
+
+    var html = '<div class="restaurant-card-wrap">';
+    html += '<a href="restaurant.html?id=' + restaurant.id + '" class="restaurant-card">';
 
     // Image
     html += '<div class="restaurant-card__image-wrap">';
@@ -284,6 +291,77 @@
 
     html += '</div></a>';
 
+    // Heart icon (outside the <a> so click doesn't navigate)
+    html += '<button class="restaurant-card__fav' + (isFav ? ' restaurant-card__fav--active' : '') + '" data-restaurant-id="' + restaurant.id + '" onclick="Foodie.Components.toggleFavourite(event, \'' + restaurant.id + '\')" title="' + (isFav ? 'Remove from favourites' : 'Add to favourites') + '">';
+    html += isFav ? Utils.icons.heartFilled : Utils.icons.heartOutline;
+    html += '</button>';
+
+    html += '</div>';
+
+    return html;
+  };
+
+  // Toggle favourite restaurant
+  Components.toggleFavourite = function(event, restaurantId) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    var user = Auth.getCurrentUser();
+    if (!user) {
+      Auth.openLoginModal();
+      return;
+    }
+
+    var added = Foodie.Storage.toggleFavourite(user.id, restaurantId);
+    Utils.showToast(added ? 'Added to favourites' : 'Removed from favourites', added ? 'success' : 'info');
+
+    // Update the heart icon in place
+    var btn = event.currentTarget;
+    if (added) {
+      btn.classList.add('restaurant-card__fav--active');
+      btn.innerHTML = Utils.icons.heartFilled;
+      btn.title = 'Remove from favourites';
+    } else {
+      btn.classList.remove('restaurant-card__fav--active');
+      btn.innerHTML = Utils.icons.heartOutline;
+      btn.title = 'Add to favourites';
+    }
+  };
+
+  // Render skeleton restaurant cards for loading state
+  Components.renderSkeletonCards = function(count) {
+    count = count || 8;
+    var html = '<div class="restaurants-grid">';
+    for (var i = 0; i < count; i++) {
+      html += '<div class="skeleton-card">';
+      html += '<div class="skeleton skeleton-card__image"></div>';
+      html += '<div class="skeleton-card__body">';
+      html += '<div class="skeleton skeleton-card__title"></div>';
+      html += '<div class="skeleton skeleton-card__meta"></div>';
+      html += '<div class="skeleton skeleton-card__text"></div>';
+      html += '</div></div>';
+    }
+    html += '</div>';
+    return html;
+  };
+
+  // Render skeleton menu items for loading state
+  Components.renderSkeletonMenuItems = function(count) {
+    count = count || 6;
+    var html = '<div class="container">';
+    html += '<div class="skeleton skeleton-menu__section-title"></div>';
+    for (var i = 0; i < count; i++) {
+      html += '<div class="skeleton-menu-item">';
+      html += '<div class="skeleton-menu-item__info">';
+      html += '<div class="skeleton skeleton-menu-item__badge"></div>';
+      html += '<div class="skeleton skeleton-menu-item__name"></div>';
+      html += '<div class="skeleton skeleton-menu-item__price"></div>';
+      html += '<div class="skeleton skeleton-menu-item__desc"></div>';
+      html += '</div>';
+      html += '<div class="skeleton skeleton-menu-item__image"></div>';
+      html += '</div>';
+    }
+    html += '</div>';
     return html;
   };
 
@@ -298,6 +376,109 @@
     }
     html += '</div>';
     return html;
+  };
+
+  // Render bottom navigation bar (mobile)
+  Components.renderBottomNav = function() {
+    // Don't render if already exists
+    if (document.getElementById('bottom-nav')) return;
+
+    var path = window.location.pathname;
+    var currentPage = 'home';
+    if (path.indexOf('restaurant.html') >= 0) currentPage = 'search';
+    else if (path.indexOf('checkout.html') >= 0) currentPage = 'cart';
+    else if (path.indexOf('my-orders.html') >= 0) currentPage = 'orders';
+    else if (path.indexOf('order-success.html') >= 0) currentPage = 'orders';
+
+    var cartCount = Cart.getCount();
+
+    var tabs = [
+      { id: 'home', label: 'Home', icon: Utils.icons.home, href: 'index.html' },
+      { id: 'search', label: 'Search', icon: Utils.icons.navSearch, href: 'index.html?search=' },
+      { id: 'cart', label: 'Cart', icon: Utils.icons.cart, href: 'checkout.html', badge: cartCount },
+      { id: 'orders', label: 'Orders', icon: Utils.icons.orders, href: 'my-orders.html' },
+      { id: 'profile', label: 'Profile', icon: Utils.icons.profile, href: '#' }
+    ];
+
+    var nav = document.createElement('nav');
+    nav.className = 'bottom-nav';
+    nav.id = 'bottom-nav';
+
+    var html = '';
+    for (var i = 0; i < tabs.length; i++) {
+      var tab = tabs[i];
+      var activeClass = currentPage === tab.id ? ' bottom-nav__item--active' : '';
+
+      if (tab.id === 'profile') {
+        var user = Auth.getCurrentUser();
+        if (user) {
+          html += '<button class="bottom-nav__item' + activeClass + '" onclick="Foodie.Components.toggleProfileDropdown()">';
+        } else {
+          html += '<button class="bottom-nav__item' + activeClass + '" onclick="Foodie.Auth.openLoginModal()">';
+        }
+      } else if (tab.id === 'search') {
+        html += '<a href="' + tab.href + '" class="bottom-nav__item' + activeClass + '" onclick="if(window.location.pathname.indexOf(\'index.html\')>=0||window.location.pathname===\'/\'){event.preventDefault();var h=document.getElementById(\'hero-search\');if(h){h.focus();h.scrollIntoView({behavior:\'smooth\'});}}">';
+      } else {
+        html += '<a href="' + tab.href + '" class="bottom-nav__item' + activeClass + '">';
+      }
+
+      html += '<span class="bottom-nav__icon">' + tab.icon;
+      if (tab.badge && tab.badge > 0) {
+        html += '<span class="bottom-nav__badge" id="bottom-nav-cart-badge">' + tab.badge + '</span>';
+      }
+      html += '</span>';
+      html += '<span class="bottom-nav__label">' + tab.label + '</span>';
+
+      html += tab.id === 'profile' ? '</button>' : '</a>';
+    }
+
+    nav.innerHTML = html;
+    document.body.appendChild(nav);
+
+    // Scroll hide/show behavior
+    var lastScrollY = window.scrollY;
+    var ticking = false;
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        window.requestAnimationFrame(function() {
+          var currentScrollY = window.scrollY;
+          if (currentScrollY > lastScrollY && currentScrollY > 100) {
+            nav.classList.add('bottom-nav--hidden');
+          } else {
+            nav.classList.remove('bottom-nav--hidden');
+          }
+          lastScrollY = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+  };
+
+  // Update bottom nav cart badge
+  Components.updateBottomNavBadge = function() {
+    var badge = document.getElementById('bottom-nav-cart-badge');
+    var count = Cart.getCount();
+    if (badge) {
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = '';
+      } else {
+        badge.style.display = 'none';
+      }
+    } else if (count > 0) {
+      // Badge doesn't exist yet, re-render the bottom nav
+      var oldNav = document.getElementById('bottom-nav');
+      if (oldNav) oldNav.remove();
+      Components.renderBottomNav();
+    }
+  };
+
+  // Override updateCartBadge to also update bottom nav
+  var _originalUpdateCartBadge = Components.updateCartBadge;
+  Components.updateCartBadge = function() {
+    _originalUpdateCartBadge.call(Components);
+    Components.updateBottomNavBadge();
   };
 
   window.Foodie.Components = Components;

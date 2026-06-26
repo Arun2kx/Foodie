@@ -216,6 +216,71 @@
     };
   };
 
+  // Bulk add items to cart (for reorder)
+  Cart.bulkAddItems = function(restaurantId, restaurantName, items) {
+    var user = Auth.getCurrentUser();
+    if (!user) return { success: false, reason: 'auth' };
+
+    var cart = Storage.getCart(user.id);
+
+    // Check restaurant conflict
+    if (cart.restaurantId && cart.restaurantId !== restaurantId && cart.items.length > 0) {
+      return { success: false, reason: 'conflict', newRestaurant: restaurantName, newRestaurantId: restaurantId, newItems: items };
+    }
+
+    cart.restaurantId = restaurantId;
+    cart.restaurantName = restaurantName;
+
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      var found = false;
+      for (var j = 0; j < cart.items.length; j++) {
+        if (cart.items[j].id === item.id) {
+          cart.items[j].qty += item.qty;
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        cart.items.push({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          isVeg: item.isVeg,
+          qty: item.qty
+        });
+      }
+    }
+
+    Storage.saveCart(user.id, cart);
+    return { success: true };
+  };
+
+  // Replace cart with multiple items (for reorder conflict resolution)
+  Cart.replaceWithItems = function(restaurantId, restaurantName, items) {
+    var user = Auth.getCurrentUser();
+    if (!user) return;
+
+    var cartItems = [];
+    for (var i = 0; i < items.length; i++) {
+      cartItems.push({
+        id: items[i].id,
+        name: items[i].name,
+        price: items[i].price,
+        isVeg: items[i].isVeg,
+        qty: items[i].qty
+      });
+    }
+
+    var cart = {
+      restaurantId: restaurantId,
+      restaurantName: restaurantName,
+      items: cartItems
+    };
+
+    Storage.saveCart(user.id, cart);
+  };
+
   // Show conflict modal
   Cart.showConflictModal = function(restaurantId, restaurantName, item, onReplace) {
     var cart = Cart.get();

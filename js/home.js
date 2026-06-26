@@ -24,7 +24,15 @@
     renderHero();
     renderCategories();
     renderFilters();
-    renderRestaurants();
+
+    // Show skeleton loading first, then render actual restaurants
+    var gridEl = document.getElementById('restaurants-grid');
+    if (gridEl) {
+      gridEl.innerHTML = '<div class="restaurants__count">&nbsp;</div>' + Components.renderSkeletonCards(8);
+    }
+    setTimeout(function() {
+      renderRestaurants();
+    }, 400);
 
     // Insert auth modals
     var modalsContainer = document.getElementById('modals');
@@ -156,7 +164,7 @@
       var cat = categories[i];
       var activeClass = state.activeCategory === cat.id ? ' category-item--active' : '';
       html += '<div class="category-item' + activeClass + '" data-category="' + cat.id + '" onclick="window._selectCategory(\'' + cat.id + '\')">';
-      html += '<div class="category-item__icon">' + cat.emoji + '</div>';
+      html += '<div class="category-item__icon"><img src="' + cat.image + '" alt="' + cat.name + '" loading="lazy"></div>';
       html += '<span class="category-item__name">' + cat.name + '</span>';
       html += '</div>';
     }
@@ -285,7 +293,15 @@
     // Active filters
     for (var f = 0; f < state.activeFilters.length; f++) {
       var filter = state.activeFilters[f];
-      if (filter === 'rating4') {
+      if (filter === 'favourites') {
+        var user = Foodie.Auth.getCurrentUser();
+        if (user) {
+          var favs = Foodie.Storage.getFavourites(user.id);
+          results = results.filter(function(r) { return favs.indexOf(r.id) >= 0; });
+        } else {
+          results = [];
+        }
+      } else if (filter === 'rating4') {
         results = results.filter(function(r) { return r.rating >= 4.0; });
       } else if (filter === 'fast_delivery') {
         results = results.filter(function(r) {

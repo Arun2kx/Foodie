@@ -217,5 +217,32 @@
     Storage.saveOrders(userId, orders);
   };
 
+  // ---- User-Scoped Favourites ----
+
+  Storage.getFavourites = function(userId) {
+    return Storage.get('foodie_favs_' + userId) || [];
+  };
+
+  Storage.saveFavourites = function(userId, favs) {
+    Storage.set('foodie_favs_' + userId, favs);
+  };
+
+  Storage.toggleFavourite = function(userId, restaurantId) {
+    var favs = Storage.getFavourites(userId);
+    var idx = favs.indexOf(restaurantId);
+    if (idx >= 0) {
+      favs.splice(idx, 1);
+    } else {
+      favs.push(restaurantId);
+    }
+    Storage.saveFavourites(userId, favs);
+    return idx < 0; // returns true if added, false if removed
+  };
+
+  Storage.isFavourite = function(userId, restaurantId) {
+    var favs = Storage.getFavourites(userId);
+    return favs.indexOf(restaurantId) >= 0;
+  };
+
   window.Foodie.Storage = Storage;
 })();
